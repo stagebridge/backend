@@ -17,18 +17,25 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "seed:performances": "ts-node -r tsconfig-paths/register src/scripts/seed-performances.ts",
+    "seed:performance-details": "ts-node -r tsconfig-paths/register src/scripts/seed-performance-details.ts",
+    "seed:box-office": "ts-node -r tsconfig-paths/register src/scripts/seed-box-office.ts",
+    "seed:all": "npm run seed:performances && npm run seed:performance-details && npm run seed:box-office"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/schedule": "^6.0.1",
     "@nestjs/typeorm": "^11.0.0",
+    "@types/xml2js": "^0.4.14",
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.27"
+    "typeorm": "^0.3.27",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
