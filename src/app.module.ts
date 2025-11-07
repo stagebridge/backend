@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { PerformanceModule } from './performance/performance.module';
+import { KopisModule } from './external/kopis/kopis.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { AppService } from './app.service';
       synchronize: true,
       logging: true,
     }),
+    KopisModule,
+    PerformanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
