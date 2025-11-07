@@ -15,10 +15,6 @@ export class KopisService {
     }
   }
 
-  /**
-   * 공연 목록 조회
-   * @param params 조회 파라미터
-   */
   async getPerformanceList(params: {
     stdate: string; // 공연시작일자 (YYYYMMDD) - 필수
     eddate: string; // 공연종료일자 (YYYYMMDD) - 필수
@@ -73,9 +69,6 @@ export class KopisService {
       }
 
       const url = `${this.baseUrl}/pblprfr?${queryParams.toString()}`;
-      
-      this.logger.debug(`KOPIS API 호출: ${url.replace(this.apiKey, '***')}`);
-
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -101,9 +94,6 @@ export class KopisService {
     }
   }
 
-  /**
-   * XML을 JSON으로 파싱
-   */
   private parseXml(xml: string): Promise<any> {
     return new Promise((resolve, reject) => {
       parseString(xml, { explicitArray: true }, (err, result) => {
@@ -116,10 +106,6 @@ export class KopisService {
     });
   }
 
-  /**
-   * 공연 상세 조회
-   * @param mt20id 공연ID
-   */
   async getPerformanceDetail(mt20id: string) {
     try {
       const queryParams = new URLSearchParams({
@@ -127,9 +113,6 @@ export class KopisService {
       });
 
       const url = `${this.baseUrl}/pblprfr/${mt20id}?${queryParams.toString()}`;
-      
-      this.logger.debug(`KOPIS API 상세 조회: ${url.replace(this.apiKey, '***')}`);
-
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -155,76 +138,6 @@ export class KopisService {
     }
   }
 
-  /**
-   * 공연시설 목록 조회
-   * @param params 조회 파라미터
-   */
-  async getFacilityList(params: {
-    cpage: number; // 현재페이지 - 필수
-    rows: number; // 페이지당 목록 수 (최대 100) - 필수
-    shprfnmfct?: string; // 공연시설명 (선택)
-    fcltychartr?: string; // 공연시설특성코드 (선택)
-    signgucode?: string; // 지역(시도)코드 (선택)
-    signgucodesub?: string; // 지역(구군)코드 (선택)
-    afterdate?: string; // 해당일자 이후 등록/수정된 항목만 출력 (선택)
-  }) {
-    try {
-      const queryParams = new URLSearchParams({
-        service: this.apiKey,
-        cpage: params.cpage.toString(),
-        rows: params.rows.toString(),
-      });
-
-      // 선택 파라미터 추가
-      if (params.shprfnmfct) {
-        queryParams.append('shprfnmfct', encodeURIComponent(params.shprfnmfct));
-      }
-      if (params.fcltychartr) {
-        queryParams.append('fcltychartr', params.fcltychartr);
-      }
-      if (params.signgucode) {
-        queryParams.append('signgucode', params.signgucode);
-      }
-      if (params.signgucodesub) {
-        queryParams.append('signgucodesub', params.signgucodesub);
-      }
-      if (params.afterdate) {
-        queryParams.append('afterdate', params.afterdate);
-      }
-
-      const url = `${this.baseUrl}/prfplc?${queryParams.toString()}`;
-      
-      this.logger.debug(`KOPIS API 시설 목록 호출: ${url.replace(this.apiKey, '***')}`);
-
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const xmlText = await response.text();
-
-      // XML을 JSON으로 파싱
-      const parsedData = await this.parseXml(xmlText);
-
-      // 결과 코드 확인
-      const resultCode = parsedData?.dbs?.resultCode?.[0];
-      if (resultCode && resultCode !== '00') {
-        const errorMsg = this.getErrorMessage(resultCode);
-        throw new Error(`KOPIS API 오류 (코드: ${resultCode}): ${errorMsg}`);
-      }
-
-      return parsedData;
-    } catch (error) {
-      this.logger.error('KOPIS API 시설 목록 호출 실패', error);
-      throw error;
-    }
-  }
-
-  /**
-   * 예매상황판 조회
-   * @param params 조회 파라미터
-   */
   async getBoxOffice(params: {
     stdate: string; // 시작일자 (YYYYMMDD) - 필수
     eddate: string; // 종료일자 (YYYYMMDD) - 필수 (최대 31일)
@@ -251,9 +164,6 @@ export class KopisService {
       }
 
       const url = `${this.baseUrl}/boxoffice?${queryParams.toString()}`;
-      
-      this.logger.debug(`KOPIS API 예매상황판 호출: ${url.replace(this.apiKey, '***')}`);
-
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -279,9 +189,6 @@ export class KopisService {
     }
   }
 
-  /**
-   * 결과 코드에 따른 에러 메시지 반환
-   */
   private getErrorMessage(code: string): string {
     const errorMessages: Record<string, string> = {
       '01': 'INVALID REQUEST PARAMETER ERROR',
