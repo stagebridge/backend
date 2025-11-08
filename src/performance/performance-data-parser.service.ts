@@ -125,7 +125,7 @@ export class PerformanceDataParser {
   }
 
   async savePerformance(data: any) {
-    const performance = this.performanceRepository.create({
+    const performanceData: Partial<Performance> = {
       mt20id: this.getFieldValue(data.mt20id),
       prfnm: this.getFieldValue(data.prfnm),
       prfpdfrom: this.getFieldValue(data.prfpdfrom),
@@ -135,7 +135,9 @@ export class PerformanceDataParser {
       genrenm: this.getFieldValue(data.genrenm),
       sidonm: this.getFieldValue(data.sidonm),
       gugunnm: this.getFieldValue(data.gugunnm),
-    });
+    };
+    
+    const performance = this.performanceRepository.create(performanceData);
 
     await this.performanceRepository.save(performance);
   }
