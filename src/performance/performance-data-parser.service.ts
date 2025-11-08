@@ -125,17 +125,19 @@ export class PerformanceDataParser {
   }
 
   async savePerformance(data: any) {
-    const performance = this.performanceRepository.create({
-      mt20id: this.getFieldValue(data.mt20id),
-      prfnm: this.getFieldValue(data.prfnm),
-      prfpdfrom: this.getFieldValue(data.prfpdfrom),
-      prfpdto: this.getFieldValue(data.prfpdto),
-      prfcast: this.getFieldValue(data.prfcast),
-      poster: this.getFieldValue(data.poster),
-      genrenm: this.getFieldValue(data.genrenm),
-      sidonm: this.getFieldValue(data.sidonm),
-      gugunnm: this.getFieldValue(data.gugunnm),
-    });
+    const performanceData: Partial<Performance> = {
+      mt20id: this.getFieldValue(data.mt20id) ?? undefined,
+      prfnm: this.getFieldValue(data.prfnm) ?? undefined,
+      prfpdfrom: this.getFieldValue(data.prfpdfrom) ?? undefined,
+      prfpdto: this.getFieldValue(data.prfpdto) ?? undefined,
+      prfcast: this.getFieldValue(data.prfcast) ?? undefined,
+      poster: this.getFieldValue(data.poster) ?? undefined,
+      genrenm: this.getFieldValue(data.genrenm) ?? undefined,
+      sidonm: this.getFieldValue(data.sidonm) ?? undefined,
+      gugunnm: this.getFieldValue(data.gugunnm) ?? undefined,
+    };
+    
+    const performance = this.performanceRepository.create(performanceData);
 
     await this.performanceRepository.save(performance);
   }
