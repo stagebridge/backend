@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PerformanceModule } from './performance/performance.module';
+import { PerformanceApiModule } from './api/performance/performance-api.module';
 import { KopisModule } from './external/kopis/kopis.module';
 
 @Module({
@@ -24,6 +25,7 @@ import { KopisModule } from './external/kopis/kopis.module';
     }),
     KopisModule,
     PerformanceModule,
+    PerformanceApiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
