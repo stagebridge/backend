@@ -41,7 +41,7 @@ export class PerformanceApiController {
   @Get('main')
   @ApiOperation({
     summary: '메인 화면 공연 목록 조회',
-    description: '순위별 및 장르별 공연 목록을 조회합니다. 순위별(ranked)은 모든 장르를 순위순으로, 장르별(byGenre)은 지정한 장르의 공연을 순위순으로 반환합니다.',
+    description: '순위별 및 장르별 공연 목록을 조회합니다. 순위별(ranked)은 모든 장르에서 순위(rnum)가 있는 공연만 순위순으로 반환하고, 장르별(byGenre)은 지정한 장르의 모든 공연을 순위순으로 반환합니다.',
   })
   @ApiQuery({
     name: 'genre',

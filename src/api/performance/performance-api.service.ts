@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Not, IsNull } from 'typeorm';
 import { Performance } from '../../performance/entities/performance.entity';
 
 @Injectable()
@@ -19,15 +19,16 @@ export class PerformanceApiService {
   }
 
   async findMainPerformances(genre: string) {
-    // 순위별: 모든 장르를 순위순으로 정렬
     const ranked = await this.performanceRepository.find({
+      where: {
+        rnum: Not(IsNull()),
+      },
       select: ['prfnm', 'prfpdfrom', 'prfpdto', 'poster', 'prfcast'],
       order: {
         rnum: 'ASC',
       },
     });
 
-    // 장르별: 특정 장르를 순위순으로 정렬
     const byGenre = await this.performanceRepository.find({
       where: {
         genrenm: genre,

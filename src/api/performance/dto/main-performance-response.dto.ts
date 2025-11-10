@@ -39,13 +39,13 @@ class MainPerformanceItemDto {
 
 export class MainPerformanceDataDto {
   @ApiProperty({
-    description: '순위별 공연 목록 (모든 장르)',
+    description: '순위별 공연 목록 (모든 장르, 순위가 있는 공연만)',
     type: [MainPerformanceItemDto],
   })
   ranked: MainPerformanceItemDto[];
 
   @ApiProperty({
-    description: '장르별 공연 목록',
+    description: '장르별 공연 목록 (지정한 장르의 모든 공연, 순위순 정렬)',
     type: [MainPerformanceItemDto],
   })
   byGenre: MainPerformanceItemDto[];
