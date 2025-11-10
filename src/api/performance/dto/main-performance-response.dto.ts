@@ -1,12 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ApiResponseDto } from './api-response.dto';
 
-export class PerformanceSummaryDto {
-  @ApiProperty({
-    description: '공연 ID',
-    example: 'PF277653',
-  })
-  mt20id: string;
-
+class MainPerformanceItemDto {
   @ApiProperty({
     description: '공연명',
     example: '정선아리랑 토요상설공연: 뗏꾼',
@@ -40,5 +35,33 @@ export class PerformanceSummaryDto {
     nullable: true,
   })
   poster: string | null;
+}
+
+export class MainPerformanceDataDto {
+  @ApiProperty({
+    description: '순위별 공연 목록 (모든 장르)',
+    type: [MainPerformanceItemDto],
+  })
+  ranked: MainPerformanceItemDto[];
+
+  @ApiProperty({
+    description: '장르별 공연 목록',
+    type: [MainPerformanceItemDto],
+  })
+  byGenre: MainPerformanceItemDto[];
+}
+
+export class MainPerformanceResponseDto {
+  @ApiProperty({
+    description: '응답 메시지',
+    example: '메인 화면 공연 목록을 성공적으로 조회했습니다.',
+  })
+  message: string;
+
+  @ApiProperty({
+    description: '응답 데이터',
+    type: MainPerformanceDataDto,
+  })
+  data: MainPerformanceDataDto;
 }
 
