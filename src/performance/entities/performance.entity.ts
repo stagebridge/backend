@@ -20,20 +20,20 @@ export class Performance {
   @Column()
   prfnm: string; // 공연명
 
-  @Column({ nullable: true })
+  @Column()
   prfpdfrom: string; // 공연시작일 (예: 2021.08.21)
 
-  @Column({ nullable: true })
+  @Column()
   prfpdto: string; // 공연종료일 (예: 2024.09.29)
 
   @Column({ nullable: true, type: 'text' })
   prfcast: string; // 공연출연진
 
-  @Column({ nullable: true, type: 'text' })
+  @Column({ type: 'text' })
   poster: string; // 포스터이미지경로
 
   // 검색 최적화를 위한 필드 (장르, 지역, 순위)
-  @Column({ nullable: true })
+  @Column()
   genrenm: string; // 공연 장르명 (장르별 검색용)
 
   @Column({ nullable: true })
@@ -45,7 +45,7 @@ export class Performance {
   @Column({ type: 'int', nullable: true })
   rnum: number; // 순위 (순위별 검색용)
 
-  @Column({ nullable: true })
+  @Column()
   mt10id: string; // 공연시설ID (참조용)
 
   // 관계 설정
