@@ -18,31 +18,32 @@ export class PerformanceApiService {
     return performances;
   }
 
-  async findMainPerformances(genre: string) {
-    const ranked = await this.performanceRepository.find({
+  async findRankedPerformances() {
+    const performances = await this.performanceRepository.find({
       where: {
         rnum: Not(IsNull()),
       },
-      select: ['prfnm', 'prfpdfrom', 'prfpdto', 'poster', 'prfcast'],
+      select: ['mt20id', 'prfnm', 'prfpdfrom', 'prfpdto', 'poster', 'prfcast'],
       order: {
         rnum: 'ASC',
       },
     });
 
-    const byGenre = await this.performanceRepository.find({
+    return performances;
+  }
+
+  async findPerformancesByGenre(genre: string) {
+    const performances = await this.performanceRepository.find({
       where: {
         genrenm: genre,
       },
-      select: ['prfnm', 'prfpdfrom', 'prfpdto', 'poster', 'prfcast'],
+      select: ['mt20id', 'prfnm', 'prfpdfrom', 'prfpdto', 'poster', 'prfcast'],
       order: {
         rnum: 'ASC',
       },
     });
 
-    return {
-      ranked,
-      byGenre,
-    };
+    return performances;
   }
 }
 

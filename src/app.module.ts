@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { PerformanceModule } from './performance/performance.module';
 import { PerformanceApiModule } from './api/performance/performance-api.module';
 import { KopisModule } from './external/kopis/kopis.module';
@@ -27,7 +25,5 @@ import { KopisModule } from './external/kopis/kopis.module';
     PerformanceModule,
     PerformanceApiModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

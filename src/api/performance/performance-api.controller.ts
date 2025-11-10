@@ -1,12 +1,12 @@
 import { Controller, Get, Query, BadRequestException } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiExtraModels } from '@nestjs/swagger';
 import { PerformanceApiService } from './performance-api.service';
 import { PerformanceSummaryDto } from './dto/performance-summary.dto';
 import { ApiResponseDto } from './dto/api-response.dto';
-import { MainPerformanceResponseDto } from './dto/main-performance-response.dto';
 
 @ApiTags('performances')
-@Controller('api/performances')
+@ApiExtraModels(PerformanceSummaryDto)
+@Controller('performances')
 export class PerformanceApiController {
   constructor(private readonly performanceApiService: PerformanceApiService) {}
 
@@ -38,10 +38,38 @@ export class PerformanceApiController {
     };
   }
 
-  @Get('main')
+  @Get('main/ranked')
   @ApiOperation({
-    summary: '메인 화면 공연 목록 조회',
-    description: '순위별 및 장르별 공연 목록을 조회합니다. 순위별(ranked)은 모든 장르에서 순위(rnum)가 있는 공연만 순위순으로 반환하고, 장르별(byGenre)은 지정한 장르의 모든 공연을 순위순으로 반환합니다.',
+    summary: '순위별 공연 목록 조회',
+    description: '모든 장르에서 순위(rnum)가 있는 공연만 순위순으로 반환합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '순위별 공연 목록 조회 성공',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: '순위별 공연 목록을 성공적으로 조회했습니다.' },
+        data: {
+          type: 'array',
+          items: { $ref: '#/components/schemas/PerformanceSummaryDto' },
+        },
+      },
+    },
+  })
+  async findRankedPerformances(): Promise<ApiResponseDto<PerformanceSummaryDto[]>> {
+    const data = await this.performanceApiService.findRankedPerformances();
+    
+    return {
+      message: '순위별 공연 목록을 성공적으로 조회했습니다.',
+      data,
+    };
+  }
+
+  @Get('main/by-genre')
+  @ApiOperation({
+    summary: '장르별 공연 목록 조회',
+    description: '지정한 장르의 모든 공연을 순위순으로 반환합니다.',
   })
   @ApiQuery({
     name: 'genre',
@@ -62,8 +90,17 @@ export class PerformanceApiController {
   })
   @ApiResponse({
     status: 200,
-    description: '메인 화면 공연 목록 조회 성공',
-    type: MainPerformanceResponseDto,
+    description: '장르별 공연 목록 조회 성공',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: '장르별 공연 목록을 성공적으로 조회했습니다.' },
+        data: {
+          type: 'array',
+          items: { $ref: '#/components/schemas/PerformanceSummaryDto' },
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 400,
@@ -77,20 +114,17 @@ export class PerformanceApiController {
       },
     },
   })
-  async findMainPerformances(
+  async findPerformancesByGenre(
     @Query('genre') genre?: string,
-  ): Promise<ApiResponseDto<{
-    ranked: Omit<PerformanceSummaryDto, 'mt20id'>[];
-    byGenre: Omit<PerformanceSummaryDto, 'mt20id'>[];
-  }>> {
+  ): Promise<ApiResponseDto<PerformanceSummaryDto[]>> {
     if (!genre) {
       throw new BadRequestException('genre 파라미터는 필수입니다.');
     }
     
-    const data = await this.performanceApiService.findMainPerformances(genre);
+    const data = await this.performanceApiService.findPerformancesByGenre(genre);
     
     return {
-      message: '메인 화면 공연 목록을 성공적으로 조회했습니다.',
+      message: '장르별 공연 목록을 성공적으로 조회했습니다.',
       data,
     };
   }
