@@ -1,12 +1,11 @@
-import { Controller, Get, Query, Param, BadRequestException } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiParam, ApiResponse, ApiTags, ApiExtraModels } from '@nestjs/swagger';
+import { Controller, Get, Query, BadRequestException } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiExtraModels } from '@nestjs/swagger';
 import { PerformanceApiService } from './performance-api.service';
 import { PerformanceSummaryDto } from './dto/performance-summary.dto';
-import { PerformanceDetailDto } from './dto/performance-detail.dto';
 import { ApiResponseDto } from './dto/api-response.dto';
 
 @ApiTags('performances')
-@ApiExtraModels(PerformanceSummaryDto, PerformanceDetailDto)
+@ApiExtraModels(PerformanceSummaryDto)
 @Controller('performances')
 export class PerformanceApiController {
   constructor(private readonly performanceApiService: PerformanceApiService) {}
@@ -126,48 +125,6 @@ export class PerformanceApiController {
     
     return {
       message: '장르별 공연 목록을 성공적으로 조회했습니다.',
-      data,
-    };
-  }
-
-  @Get(':id')
-  @ApiOperation({
-    summary: '공연 상세 정보 조회',
-    description: '공연 ID를 파라미터로 받아 공연의 상세 정보를 반환합니다.',
-  })
-  @ApiParam({
-    name: 'id',
-    description: '공연 ID',
-    example: 'PF277653',
-  })
-  @ApiResponse({
-    status: 200,
-    description: '공연 상세 정보 조회 성공',
-    schema: {
-      type: 'object',
-      properties: {
-        message: { type: 'string', example: '공연 상세 정보를 성공적으로 조회했습니다.' },
-        data: { $ref: '#/components/schemas/PerformanceDetailDto' },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 404,
-    description: '공연을 찾을 수 없을 경우',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: { type: 'number', example: 404 },
-        message: { type: 'string', example: '공연 ID PF277653를 찾을 수 없습니다.' },
-        error: { type: 'string', example: 'Not Found' },
-      },
-    },
-  })
-  async findOne(@Param('id') id: string): Promise<ApiResponseDto<PerformanceDetailDto>> {
-    const data = await this.performanceApiService.findOne(id);
-    
-    return {
-      message: '공연 상세 정보를 성공적으로 조회했습니다.',
       data,
     };
   }

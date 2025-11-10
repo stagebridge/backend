@@ -16,14 +16,16 @@ export class PerformanceSummaryDto {
   @ApiProperty({
     description: '공연 시작일',
     example: '2025.04.05',
+    nullable: true,
   })
-  prfpdfrom: string;
+  prfpdfrom: string | null;
 
   @ApiProperty({
     description: '공연 종료일',
     example: '2025.11.22',
+    nullable: true,
   })
-  prfpdto: string;
+  prfpdto: string | null;
 
   @ApiProperty({
     description: '공연 출연진',
@@ -35,7 +37,8 @@ export class PerformanceSummaryDto {
   @ApiProperty({
     description: '포스터 이미지 URL',
     example: 'http://www.kopis.or.kr/upload/pfmPoster/PF_PF277653_251029_130842.png',
+    nullable: true,
   })
-  poster: string;
+  poster: string | null;
 }
 
