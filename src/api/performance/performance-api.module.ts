@@ -10,4 +10,3 @@ import { Performance } from '../../performance/entities/performance.entity';
   providers: [PerformanceApiService],
 })
 export class PerformanceApiModule {}
-
