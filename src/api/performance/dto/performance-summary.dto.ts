@@ -15,15 +15,17 @@ export class PerformanceSummaryDto {
 
   @ApiProperty({
     description: '공연 시작일',
-    example: '2025.04.05',
+    example: '2025-04-05T00:00:00.000Z',
+    type: Date,
   })
-  prfpdfrom: string;
+  prfpdfrom: Date;
 
   @ApiProperty({
     description: '공연 종료일',
-    example: '2025.11.22',
+    example: '2025-11-22T00:00:00.000Z',
+    type: Date,
   })
-  prfpdto: string;
+  prfpdto: Date;
 
   @ApiProperty({
     description: '공연 출연진',

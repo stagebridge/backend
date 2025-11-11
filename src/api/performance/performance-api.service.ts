@@ -13,6 +13,9 @@ export class PerformanceApiService {
   async findAllSummaries() {
     const performances = await this.performanceRepository.find({
       select: ['mt20id', 'prfnm', 'prfpdfrom', 'prfpdto', 'prfcast', 'poster'],
+      order: {
+        prfpdto: 'ASC',
+      },
     });
 
     return performances;
@@ -40,6 +43,7 @@ export class PerformanceApiService {
       select: ['mt20id', 'prfnm', 'prfpdfrom', 'prfpdto', 'poster', 'prfcast'],
       order: {
         rnum: 'ASC',
+        prfpdto: 'ASC',
       },
     });
 
