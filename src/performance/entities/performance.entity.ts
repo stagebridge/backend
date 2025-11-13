@@ -3,15 +3,15 @@ import {
   Column,
   PrimaryColumn,
   OneToOne,
-  JoinColumn,
   Index,
 } from 'typeorm';
 import { PerformanceDetail } from './performance-detail.entity';
 
 @Entity('performances')
-@Index(['genrenm']) // 장르별 검색 최적화
-@Index(['sidonm', 'gugunnm']) // 지역별 검색 최적화
 @Index(['rnum']) // 순위별 검색 최적화
+@Index(['prfpdto']) // 종료일 정렬 최적화
+@Index(['genrenm', 'rnum', 'prfpdto']) // 장르별 검색 + 순위 + 종료일 정렬 최적화
+@Index(['sidonm', 'rnum', 'prfpdto']) // 지역별 검색 + 순위 + 종료일 정렬 최적화
 export class Performance {
   @PrimaryColumn()
   mt20id: string; // 공연ID
@@ -20,11 +20,11 @@ export class Performance {
   @Column()
   prfnm: string; // 공연명
 
-  @Column()
-  prfpdfrom: string; // 공연시작일 (예: 2021.08.21)
+  @Column({ type: 'date' })
+  prfpdfrom: Date; // 공연시작일
 
-  @Column()
-  prfpdto: string; // 공연종료일 (예: 2024.09.29)
+  @Column({ type: 'date' })
+  prfpdto: Date; // 공연종료일
 
   @Column({ nullable: true, type: 'text' })
   prfcast: string; // 공연출연진
@@ -44,9 +44,6 @@ export class Performance {
 
   @Column({ type: 'int', nullable: true })
   rnum: number; // 순위 (순위별 검색용)
-
-  @Column()
-  mt10id: string; // 공연시설ID (참조용)
 
   // 관계 설정
   @OneToOne(() => PerformanceDetail, (detail) => detail.performance, {

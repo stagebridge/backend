@@ -12,7 +12,10 @@ export class PerformanceApiService {
 
   async findAllSummaries() {
     const performances = await this.performanceRepository.find({
-      select: ['mt20id', 'prfnm', 'prfpdfrom', 'prfpdto', 'prfcast', 'poster'],
+      select: ['mt20id', 'prfnm', 'prfpdfrom', 'prfpdto', 'poster', 'prfcast'],
+      order: {
+        prfpdto: 'ASC',
+      },
     });
 
     return performances;
@@ -40,6 +43,22 @@ export class PerformanceApiService {
       select: ['mt20id', 'prfnm', 'prfpdfrom', 'prfpdto', 'poster', 'prfcast'],
       order: {
         rnum: 'ASC',
+        prfpdto: 'ASC',
+      },
+    });
+
+    return performances;
+  }
+
+  async findPerformancesBySidonm(sidonm: string) {
+    const performances = await this.performanceRepository.find({
+      where: {
+        sidonm: sidonm,
+      },
+      select: ['mt20id', 'prfnm', 'prfpdfrom', 'prfpdto', 'poster', 'prfcast'],
+      order: {
+        rnum: 'ASC',
+        prfpdto: 'ASC',
       },
     });
 

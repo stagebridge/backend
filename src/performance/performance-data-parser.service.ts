@@ -118,6 +118,33 @@ export class PerformanceDataParser {
     return `${year}${month}${day}`;
   }
 
+  /**
+   * KOPIS API의 날짜 형식 (YYYY.MM.DD)을 Date 객체로 변환
+   * 예: "2025.04.05" -> Date(2025-04-05)
+   * PostgreSQL date 타입과 호환되도록 UTC 기준으로 생성
+   */
+  parseDate(dateString: string | null): Date | undefined {
+    if (!dateString) return undefined;
+    
+    try {
+      // "YYYY.MM.DD" 형식을 "YYYY-MM-DD"로 변환
+      const normalized = dateString.replace(/\./g, '-');
+      const [year, month, day] = normalized.split('-').map(Number);
+      
+      // UTC 기준으로 Date 객체 생성 (시간대 문제 방지)
+      const date = new Date(Date.UTC(year, month - 1, day));
+      
+      // 유효한 날짜인지 확인
+      if (isNaN(date.getTime())) {
+        return undefined;
+      }
+      
+      return date;
+    } catch (error) {
+      return undefined;
+    }
+  }
+
   parseIntValue(value: string | null): number | null {
     if (!value) return null;
     const parsed = parseInt(value.replace(/,/g, ''), 10);
@@ -125,11 +152,22 @@ export class PerformanceDataParser {
   }
 
   async savePerformance(data: any) {
+    const prfpdfromStr = this.getFieldValue(data.prfpdfrom);
+    const prfpdtoStr = this.getFieldValue(data.prfpdto);
+
+    const prfpdfrom = this.parseDate(prfpdfromStr);
+    const prfpdto = this.parseDate(prfpdtoStr);
+
+    // 필수 날짜 필드 검증
+    if (!prfpdfrom || !prfpdto) {
+      return; // 날짜가 없으면 저장하지 않음
+    }
+
     const performanceData: Partial<Performance> = {
       mt20id: this.getFieldValue(data.mt20id) ?? undefined,
       prfnm: this.getFieldValue(data.prfnm) ?? undefined,
-      prfpdfrom: this.getFieldValue(data.prfpdfrom) ?? undefined,
-      prfpdto: this.getFieldValue(data.prfpdto) ?? undefined,
+      prfpdfrom,
+      prfpdto,
       prfcast: this.getFieldValue(data.prfcast) ?? undefined,
       poster: this.getFieldValue(data.poster) ?? undefined,
       genrenm: this.getFieldValue(data.genrenm) ?? undefined,
@@ -149,9 +187,6 @@ export class PerformanceDataParser {
 
     const performanceUpdateData: any = {};
 
-    if (mt10id) {
-      performanceUpdateData.mt10id = mt10id;
-    }
     if (sidonm) {
       performanceUpdateData.sidonm = sidonm;
     }

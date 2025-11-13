@@ -130,6 +130,58 @@ export class PerformanceApiController {
     };
   }
 
+  @Get('main/by-sidonm')
+  @ApiOperation({
+    summary: '지역별 공연 목록 조회',
+    description: '지정한 지역(시도)의 모든 공연을 순위순으로 반환합니다.',
+  })
+  @ApiQuery({
+    name: 'sidonm',
+    description: '지역명(시도) (필수)',
+    example: '서울',
+    required: true,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '지역별 공연 목록 조회 성공',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: '지역별 공연 목록을 성공적으로 조회했습니다.' },
+        data: {
+          type: 'array',
+          items: { $ref: '#/components/schemas/PerformanceSummaryDto' },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'sidonm 파라미터가 없을 경우',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: { type: 'number', example: 400 },
+        message: { type: 'string', example: 'sidonm 파라미터는 필수입니다.' },
+        error: { type: 'string', example: 'Bad Request' },
+      },
+    },
+  })
+  async findPerformancesBySidonm(
+    @Query('sidonm') sidonm?: string,
+  ): Promise<ApiResponseDto<PerformanceSummaryDto[]>> {
+    if (!sidonm) {
+      throw new BadRequestException('sidonm 파라미터는 필수입니다.');
+    }
+    
+    const data = await this.performanceApiService.findPerformancesBySidonm(sidonm);
+    
+    return {
+      message: '지역별 공연 목록을 성공적으로 조회했습니다.',
+      data,
+    };
+  }
+
   @Get(':id')
   @ApiOperation({
     summary: '공연 상세 정보 조회',
