@@ -3,17 +3,15 @@ import {
   Column,
   PrimaryColumn,
   OneToOne,
-  JoinColumn,
   Index,
 } from 'typeorm';
 import { PerformanceDetail } from './performance-detail.entity';
 
 @Entity('performances')
-@Index(['genrenm']) // 장르별 검색 최적화
-@Index(['sidonm', 'gugunnm']) // 지역별 검색 최적화
 @Index(['rnum']) // 순위별 검색 최적화
 @Index(['prfpdto']) // 종료일 정렬 최적화
-@Index(['rnum', 'prfpdto']) // 순위 + 종료일 다중 정렬 최적화
+@Index(['genrenm', 'rnum', 'prfpdto']) // 장르별 검색 + 순위 + 종료일 정렬 최적화
+@Index(['sidonm', 'rnum', 'prfpdto']) // 지역별 검색 + 순위 + 종료일 정렬 최적화
 export class Performance {
   @PrimaryColumn()
   mt20id: string; // 공연ID
