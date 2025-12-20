@@ -85,6 +85,7 @@ export class PerformanceApiService {
           pcseguidance: true,
           dtguidance: true,
           prfcrew: true,
+          styurls: true,
         },
       },
     });
@@ -108,6 +109,7 @@ export class PerformanceApiService {
       pcseguidance: performance.detail?.pcseguidance ?? null,
       dtguidance: performance.detail?.dtguidance ?? null,
       prfcrew: performance.detail?.prfcrew ?? null,
+      styurls: performance.detail?.styurls ?? null,
     };
   }
 }

@@ -94,5 +94,17 @@ export class PerformanceDetailDto {
     nullable: true,
   })
   prfcrew: string | null;
+
+  @ApiProperty({
+    description: '소개 이미지 URL 목록',
+    example: [
+      'http://www.kopis.or.kr/upload/pfmIntroImage/PF_PF277653_251029_130842.jpg',
+      'http://www.kopis.or.kr/upload/pfmIntroImage/PF_PF277653_251029_130843.jpg',
+    ],
+    type: [String],
+    isArray: true,
+    nullable: true,
+  })
+  styurls: string[] | null;
 }
 
