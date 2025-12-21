@@ -4,6 +4,8 @@ import { ConfigModule } from '@nestjs/config';
 import { PerformanceModule } from './performance/performance.module';
 import { PerformanceApiModule } from './api/performance/performance-api.module';
 import { KopisModule } from './external/kopis/kopis.module';
+import { AuthModule } from './api/auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { KopisModule } from './external/kopis/kopis.module';
     KopisModule,
     PerformanceModule,
     PerformanceApiModule,
+    UserModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
