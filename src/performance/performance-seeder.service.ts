@@ -5,6 +5,7 @@ import { Performance } from './entities/performance.entity';
 import { PerformanceDetail } from './entities/performance-detail.entity';
 import { KopisService } from '../external/kopis/kopis.service';
 import { PerformanceDataParser } from './performance-data-parser.service';
+import { ConcurrencyLimiter } from '../common/utils/concurrency-limiter';
 
 @Injectable()
 export class PerformanceSeederService {
@@ -57,15 +58,21 @@ export class PerformanceSeederService {
           break;
         }
 
-        for (const item of performances) {
+        const limiter = new ConcurrencyLimiter(5);
+        const filteredPerformances = performances.filter((item) => {
           const prfstate = item.prfstate?.[0] || item.prfstate;
-          if (prfstate === '공연완료') {
-            continue;
-          }
+          return prfstate !== '공연완료';
+        });
 
+        const savePromises = filteredPerformances.map((item) =>
+          limiter.execute(async () => {
           await this.dataParser.savePerformance(item);
-          totalSaved++;
-        }
+          }),
+        );
+
+        const results = await Promise.allSettled(savePromises);
+        const savedCount = results.filter((r) => r.status === 'fulfilled').length;
+        totalSaved += savedCount;
 
         this.logger.log(`페이지 ${page} 처리 완료 (${performances.length}개)`);
 
@@ -97,20 +104,28 @@ export class PerformanceSeederService {
 
       let totalUpdated = 0;
 
-      for (const performance of performances) {
+      const limiter = new ConcurrencyLimiter(3);
+      const detailPromises = performances.map((performance) =>
+        limiter.execute(async () => {
         const detailData = await this.kopisService.getPerformanceDetail(
           performance.mt20id,
         );
 
         const db = this.dataParser.extractDetailData(detailData);
         if (!db) {
-          continue;
+            return false;
         }
 
         await this.dataParser.savePerformanceDetail(performance.mt20id, db);
-        totalUpdated++;
-        await this.delay(1000);
-      }
+        await this.delay(500);
+          return true;
+        }),
+      );
+
+      const results = await Promise.allSettled(detailPromises);
+      totalUpdated = results.filter(
+        (r) => r.status === 'fulfilled' && r.value === true,
+      ).length;
 
       this.logger.log(`공연 상세 정보 수집 완료! ${totalUpdated}개 업데이트`);
       return { success: true, totalUpdated };
@@ -181,30 +196,39 @@ export class PerformanceSeederService {
 
       let totalUpdated = 0;
 
-      for (const item of boxOffices) {
+      const limiter = new ConcurrencyLimiter(10);
+      const filteredBoxOffices = boxOffices.filter((item) => {
         const mt20id = this.dataParser.getFieldValue(item.mt20id);
-        if (!mt20id) {
-          continue;
-        }
+        return !!mt20id;
+      });
 
-        const performance = await this.performanceRepository.findOne({
-          where: { mt20id },
-        });
+      const updatePromises = filteredBoxOffices.map((item) =>
+        limiter.execute(async () => {
+          const mt20id = this.dataParser.getFieldValue(item.mt20id)!;
 
-        // DB에 없으면 건너뜀
-        if (!performance) {
-          continue;
-        }
+          const performance = await this.performanceRepository.findOne({
+            where: { mt20id },
+          });
 
-        // 순위 업데이트
-        const rnum = this.dataParser.parseIntValue(
-          this.dataParser.getFieldValue(item.rnum),
-        );
-        if (rnum !== null) {
-          await this.performanceRepository.update(mt20id, { rnum });
-          totalUpdated++;
-        }
-      }
+          if (!performance) {
+            return false;
+          }
+
+          const rnum = this.dataParser.parseIntValue(
+            this.dataParser.getFieldValue(item.rnum),
+          );
+          if (rnum !== null) {
+            await this.performanceRepository.update(mt20id, { rnum });
+            return true;
+          }
+          return false;
+        }),
+      );
+
+      const results = await Promise.allSettled(updatePromises);
+      totalUpdated = results.filter(
+        (r) => r.status === 'fulfilled' && r.value === true,
+      ).length;
 
       this.logger.log(`예매상황판 순위 업데이트 완료! ${totalUpdated}개 업데이트`);
       return { success: true, totalUpdated };
