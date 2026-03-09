@@ -12,12 +12,12 @@ export class User {
   @Column({ unique: true })
   id: string;
 
-  @Column()
-  password: string;
+  @Column({ type: 'varchar', nullable: true })
+  password: string | null;
 
   @Column()
   nickname: string;
 
-  @Column({ nullable: true })
-  email: string;
+  @Column({ type: 'varchar', nullable: true })
+  email: string | null;
 }

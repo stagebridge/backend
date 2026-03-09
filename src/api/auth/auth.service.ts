@@ -31,7 +31,7 @@ export class AuthService {
       id: signupDto.id,
       password: hashedPassword,
       nickname: signupDto.nickname,
-      email: signupDto.email,
+      email: signupDto.email || null,
     });
 
     const savedUser = await this.userRepository.save(user);
@@ -40,25 +40,24 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
+    const userId = loginDto.id.trim();
     const user = await this.userRepository.findOne({
-      where: { id: loginDto.id },
+      where: { id: userId },
     });
+    const hashedPassword = user?.password;
 
-    if (!user) {
-      throw new UnauthorizedException('ID 또는 비밀번호가 올바르지 않습니다.');
+    if (!user || !hashedPassword) {
+      throw new UnauthorizedException('아이디 또는 비밀번호가 올바르지 않습니다.');
     }
 
-    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+    const isPasswordValid = await bcrypt.compare(loginDto.password, hashedPassword);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('ID 또는 비밀번호가 올바르지 않습니다.');
+      throw new UnauthorizedException('아이디 또는 비밀번호가 올바르지 않습니다.');
     }
 
-    const payload = { sub: user.uuid, id: user.id };
-    const accessToken = this.jwtService.sign(payload);
-
     return {
-      accessToken,
+      accessToken: this.signAccessToken(user),
       user: this.toUserResponseDto(user),
     };
   }
@@ -74,5 +73,10 @@ export class AuthService {
       nickname: user.nickname,
       email: user.email || null,
     };
+  }
+
+  private signAccessToken(user: User): string {
+    const payload = { sub: user.uuid, id: user.id };
+    return this.jwtService.sign(payload);
   }
 }
